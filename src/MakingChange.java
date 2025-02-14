@@ -12,13 +12,13 @@ public class MakingChange {
      *  for any given total with any given set of coins.
      */
     public static long countWays(int target, int[] coins) {
-        long combinations = tabulateWays(target, coins);
-//        for(int i = 0; i < coins.length; i++) {
-//            combinations += countWaysRecur(target, coins, coins[i], 0);
-//        }
-        return combinations;
+        // Tabulation approach:
+        return tabulateWays(target, coins);
+        // Memoization approach:
+        // return memoizeWays(target, coins);
     }
 
+    // A tabulation approach to countWays
     public static long tabulateWays(int target, int[] coins){
         long[][] ways = new long[coins.length][target + 1];
         // Initialize first column of ways to 1
@@ -48,29 +48,31 @@ public class MakingChange {
         return ways[coins.length - 1][target];
     }
 
+    // A memoization approach to countWays
     public static long memoizeWays(int target, int[] coins){
         long[][] ways = new long[coins.length][target + 1];
         // Initialize first column of ways to 1
         for(int i = 0; i < ways.length; i++){
             ways[i][0] = 1;
         }
+        // Call recursive memoization approach with proper parameters
+        memoizeWays(target, coins, coins.length - 1, ways);
         return ways[coins.length - 1][target];
     }
-    public static long memoizeWays(int target, int[] coins, )
-//    public static long countWaysRecur(int target, int[] coins, int coinUsed, int debug) {
-//        target = target - coinUsed;
-//        if(target < 0) {
-//            return 0;
-//        }
-//        if(target == 0){
-//            return 1;
-//        }
-//        int combinations = 0;
-//        for(int i = 0; i < coins.length; i++) {
-//            combinations += countWaysRecur(target, coins, coins[i], debug + 1);
-//        }
-//        return combinations;
-//    }
-//    public static int count(int target, int[] coins){
-//    }
+    // Recursive memoization method
+    public static long memoizeWays(int target, int[] coins, int coinsIndex, long[][] ways){
+        // Base case keeps everything in-bounds and deals with filling the first row and
+        // first few entries in each row until coin >= target
+        if(coinsIndex == -1 || target < 0){
+            return 0;
+        }
+        // If this case has already been recorded, return the recorded value
+        if(ways[coinsIndex][target] != 0){
+            return ways[coinsIndex][target];
+        }
+        // Recursively call the exclude and include states and record the result for future use
+        ways[coinsIndex][target] = memoizeWays(target, coins, coinsIndex - 1, ways) + memoizeWays(target - coins[coinsIndex], coins, coinsIndex, ways);
+        // Return this count
+        return ways[coinsIndex][target];
+    }
 }
